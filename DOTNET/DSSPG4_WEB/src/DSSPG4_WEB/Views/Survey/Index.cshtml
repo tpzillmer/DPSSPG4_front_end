@@ -1,0 +1,23 @@
+﻿@using DSSPG4_WEB.Models.SurvetViewModels
+@model SurveyIndexViewModel
+
+
+<h1 align="center"> Surveys</h1>
+<hr>
+<div>
+    @foreach (var res in Model.surveys)
+    {
+        @Html.Partial("_Summary", res)
+
+    }
+</div>
+
+<div>
+    <a class="btn btn-default" asp-controller="Survey" asp-action="Create">Create Survey</a>
+</div>
+
+<script>
+    $(document).ready(function () {
+      $("div[id$=dvProgress]").fadeOut("fast");
+    });
+</script>

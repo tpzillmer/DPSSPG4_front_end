@@ -1,0 +1,12 @@
+﻿@model Survey
+
+<section class="panel panel-default">
+    <div class="panel-heading">@Model.SurveyName</div>
+    <div class="panel-body">
+
+        <div>
+            <a class="btn btn-default btn-xs" asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+            <a class="btn btn-default btn-xs" asp-action="Delete" asp-route-id="@Model.Id">Delete</a> | 
+        </div>
+    </div>
+</section>

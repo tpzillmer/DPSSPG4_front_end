@@ -1,0 +1,46 @@
+﻿@model User
+@{
+    ViewBag.Title = "Register";
+}
+
+<div id="modalAccountDelete" tabindex="-1" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="post" asp-controller="Account" asp-action="Delete">
+                <div class="modal-header" style="padding:35px 50px;"><h1>Delete @Model.UserName ?</h1></div>
+                <div asp-validation-summary="All"></div>
+                <div id="deleteAccountbtn" class="modal-body" style="padding:40px 50px;">
+                    <div>
+                        <input type="submit" class="btn btn-default btn-success btn-block" value="Delete" /> 
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <a class="btn btn-default btn-danger pull-left" asp-controller="Account" asp-action="Index"><span class="glyphicon glyphicon-remove"></span> Cancel</a>
+            </div>
+         </div>
+      </div>
+   </div>
+
+<script>
+    $(document).ready(function () {
+        $("#modalAccountDelete").modal({
+            backdrop: 'static'
+        });
+        $("#modalAccountDelete").modal('show');
+    });
+
+</script>
+<style>
+    .modal-header, h4, .close {
+        background-color: #00bc8c;
+        color: white !important;
+        text-align: center;
+        font-size: 30px;
+    }
+
+    .modal-footer {
+        background-color: #f9f9f9;
+    }
+</style>
