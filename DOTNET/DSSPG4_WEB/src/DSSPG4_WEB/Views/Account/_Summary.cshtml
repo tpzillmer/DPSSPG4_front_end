@@ -1,0 +1,14 @@
+﻿@model User
+
+<section class="panel panel-default">
+    <div class="panel-heading">@Model.UserName</div>
+    <div class="panel-body">
+
+        <div>
+            <a class="btn btn-default btn-xs" asp-action="Profile" asp-route-id="@Model.Id">Profile</a> |
+            <a class="btn btn-default btn-xs" asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+            <a class="btn btn-default btn-xs" asp-action="Delete" asp-route-id="@Model.Id">Delete</a> | 
+            <a class="btn btn-default btn-xs" asp-controller="UserRoles" asp-action="AddUserToRole" asp-route-id="@Model.Id">Add To Role</a>
+        </div>
+    </div>
+</section>
