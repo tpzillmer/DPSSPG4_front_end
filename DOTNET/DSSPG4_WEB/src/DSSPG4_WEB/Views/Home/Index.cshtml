@@ -1,4 +1,18 @@
-﻿@{
+﻿@inject SignInManager<User> SignInManager
+@model HomeIndexViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
+<hr />
+@if (SignInManager.IsSignedIn(User))
+{
+    <div>
+        @foreach (var res in Model.Surveys)
+        {
+            @Html.Partial("_SurveySummary", res)
+
+        }
+    </div>
+}

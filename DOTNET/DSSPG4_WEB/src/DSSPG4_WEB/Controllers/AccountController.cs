@@ -6,6 +6,7 @@ using DSSPG4_WEB.Models.Entities;
 using DSSPG4_WEB.Models.AccountViewModels;
 using Microsoft.Extensions.Logging;
 using System.Linq;
+using DSSPG4_WEB.Services.UserServices;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,14 +17,17 @@ namespace DSSPG4_WEB.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger _logger;
         private readonly UserManager<User> _userManager;
+        private readonly UserService _userService;
 
         public AccountController(SignInManager<User> signInManager,
                                  ILoggerFactory loggerFactory,
-                                 UserManager<User> userManager)
+                                 UserManager<User> userManager,
+                                 UserService userService)
         {
             _signInManager = signInManager;
             _logger = loggerFactory.CreateLogger<AccountController>();
             _userManager = userManager;
+            _userService = userService;
         }
 
         // GET: /<controller>/
@@ -84,6 +88,55 @@ namespace DSSPG4_WEB.Controllers
             await _signInManager.SignOutAsync();
             _logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+
+
+        // GET: /Account/Register
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Register(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                var user = new User {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Gender = model.Gender.Value,
+                    UserName = model.Email, 
+                    Email = model.Email,
+                    Birth = model.Birth
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
+                    // Send an email with this link
+                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                    //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
+                    //    $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                    await _userService.AddUserToRole(user, "user");
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    _logger.LogInformation(3, "User created a new account with password.");
+                    return RedirectToLocal(returnUrl);
+                }
+
+                AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
         }
 
         private void AddErrors(IdentityResult result)

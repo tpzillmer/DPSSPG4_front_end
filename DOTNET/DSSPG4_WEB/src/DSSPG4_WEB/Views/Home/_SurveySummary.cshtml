@@ -1,0 +1,11 @@
+﻿@model Survey
+
+<section class="panel panel-default">
+    <div class="panel-heading">@Model.SurveyName</div>
+    <div class="panel-footer">Taken Count : @Model.SurveysTaken</div>
+    <div class="panel-body">
+        <div>
+            <a class="btn btn-default btn-xs" asp-controller="Survey" asp-action="Take" asp-route-id="@Model.Id">Take</a> 
+        </div>
+    </div>
+</section>
