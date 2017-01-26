@@ -1,5 +1,6 @@
 ﻿using DSSPG4_WEB.Data;
 using DSSPG4_WEB.Models.Entities;
+using DSSPG4_WEB.Models.Enums;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,8 +23,11 @@ namespace DSSPG4_WEB.Services.SurveyServices
 
         public void AddQuestion(SurveyQuestion question)
         {
-            _context.Add(question);
-            Commit();
+            if (!SurveyQuestionExists(question))
+            {
+                _context.Add(question);
+                Commit();
+            }
         }
 
         public void Remove(Survey survey)
@@ -75,14 +79,34 @@ namespace DSSPG4_WEB.Services.SurveyServices
             }
         }
 
+        public IEnumerable<SurveyQuestion> GetSurveyQuestions(int id)
+        {
+            return _context.SurveyQuestions.Where(s => s.SurveyId == id);
+        }
+
         public Survey GetSurveyByName(string name)
         {
             return _context.Surveys.FirstOrDefault(s => s.SurveyName == name);
         }
 
+        public Survey GetSurveyById(int id)
+        {
+            return _context.Surveys.FirstOrDefault(s => s.Id == id);
+        }
+
         public IEnumerable<Survey> GetAllSurveys()
         {
             return _context.Surveys.ToList();
+        }
+
+        public IEnumerable<Survey> GetAllOpenSurveys()
+        {
+            return _context.Surveys.Where(s => s.Status == SurveyStatus.Open);
+        }
+
+        public IEnumerable<Survey> GetAllClosedSurveys()
+        {
+            return _context.Surveys.Where(s => s.Status == SurveyStatus.Closed);
         }
     }
 }

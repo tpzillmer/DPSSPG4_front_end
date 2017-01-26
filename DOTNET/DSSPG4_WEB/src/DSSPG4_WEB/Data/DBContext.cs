@@ -1,4 +1,5 @@
 ﻿using DSSPG4_WEB.Models.Entities;
+using DSSPG4_WEB.Models.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
