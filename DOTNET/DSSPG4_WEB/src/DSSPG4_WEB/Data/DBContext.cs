@@ -18,6 +18,8 @@ namespace DSSPG4_WEB.Data
 
         public virtual DbSet<SurveyQuestion> SurveyQuestions { get; set; }
 
+        public virtual DbSet<Response> Responses { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

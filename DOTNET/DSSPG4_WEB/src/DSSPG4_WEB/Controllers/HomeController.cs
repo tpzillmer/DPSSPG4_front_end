@@ -26,7 +26,7 @@ namespace DSSPG4_WEB.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
+            ViewData["Message"] = "Tautua - Surveys made easy!";
 
             return View();
         }

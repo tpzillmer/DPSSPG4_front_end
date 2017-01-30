@@ -7,32 +7,36 @@ using DSSPG4_WEB.Models.AccountViewModels;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using DSSPG4_WEB.Services.UserServices;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using DSSPG4_WEB.Services.RoleServices;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DSSPG4_WEB.Controllers
 {
+ 
     public class AccountController : Controller
     {
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger _logger;
         private readonly UserManager<User> _userManager;
         private readonly UserService _userService;
-
+        private readonly RoleService _roleService;
         public AccountController(SignInManager<User> signInManager,
                                  ILoggerFactory loggerFactory,
                                  UserManager<User> userManager,
-                                 UserService userService)
+                                 UserService userService,
+                                 RoleService roleService)
         {
             _signInManager = signInManager;
             _logger = loggerFactory.CreateLogger<AccountController>();
             _userManager = userManager;
             _userService = userService;
+            _roleService = roleService;
         }
 
-        // GET: /<controller>/
         [Authorize(Policy = "RequireAdministratorRole")]
-        //[Authorize(Roles = "admin")]
         public ActionResult Index()
         {
             var all = _userManager.Users.ToList();
@@ -139,6 +143,25 @@ namespace DSSPG4_WEB.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        public async Task<IActionResult> AddUserToRole(string Id)
+        {
+            RolesByUserViewModel model = new RolesByUserViewModel();
+            User user = await _userManager.FindByIdAsync(Id);
+            model.Roles = _roleService.GetRolesSelectList(); ;
+            model.User = user;
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        public async Task<IActionResult> AddUserToRole(string Id, RolesByUserViewModel model)
+        {
+            User this_user = await _userManager.FindByIdAsync(Id);
+            await _userManager.AddToRoleAsync(this_user, model.RoleSelected);
+            return RedirectToAction("Index", "Account");
+        }
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)

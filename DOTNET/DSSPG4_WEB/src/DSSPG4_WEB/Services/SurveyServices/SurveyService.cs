@@ -68,6 +68,7 @@ namespace DSSPG4_WEB.Services.SurveyServices
 
             else return true;
         }
+
         public void AddSurveyQuestions(IEnumerable<SurveyQuestion> questions)
         {
             foreach(var q in questions)
@@ -79,9 +80,32 @@ namespace DSSPG4_WEB.Services.SurveyServices
             }
         }
 
+        public void AddSurveyQuestionResponse(Response response)
+        {
+            _context.Responses.Add(response);
+            Commit();
+        }
+
+        public void BumpSurveyTakenCount(int id)
+        {
+            var survey = GetSurveyById(id);
+            survey.SurveysTaken += 1;
+            Commit();
+        }
+
         public IEnumerable<SurveyQuestion> GetSurveyQuestions(int id)
         {
             return _context.SurveyQuestions.Where(s => s.SurveyId == id);
+        }
+
+        public IEnumerable<Response> GetSurveyResponsesBySurveyId(int id)
+        {
+            return _context.Responses.Where(r => r.ParentQuestion.ParentSurvey.Id == id);
+        }
+
+        public SurveyQuestion GetSurveyQuestionById(int id)
+        {
+            return _context.SurveyQuestions.FirstOrDefault(q => q.Id == id);
         }
 
         public Survey GetSurveyByName(string name)
