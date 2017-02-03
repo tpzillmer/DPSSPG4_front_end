@@ -1,6 +1,7 @@
 ﻿using DSSPG4_WEB.Data;
 using DSSPG4_WEB.Models.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,13 @@ namespace DSSPG4_WEB.Services.RoleServices
         public async Task<bool> RoleExist(string roleName)
         {
            return await _roleManager.RoleExistsAsync(roleName);
+        }
+
+        public IEnumerable<SelectListItem> GetRolesSelectList()
+        {
+
+            IEnumerable<SelectListItem> list = _context.Roles.OrderBy(x => x.Name).ToList().Select(rr => new SelectListItem { Value = rr.Name.ToString(), Text = rr.Name.ToString() }).ToList();
+            return list;
         }
 
     }

@@ -9,6 +9,8 @@ using DSSPG4_WEB.Models.Entities;
 using DSSPG4_WEB.Services.UserServices;
 using DSSPG4_WEB.Services.RoleServices;
 using DSSPG4_WEB.Services.SurveyServices;
+using DSSPG4_WEB.Interfaces;
+using DSSPG4_WEB.Services.MessageSevices;
 
 namespace DSSPG4_WEB
 {
@@ -39,7 +41,8 @@ namespace DSSPG4_WEB
             services.AddApplicationInsightsTelemetry(Configuration);
             services.AddDbContext<DBContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
+            services.AddTransient<IEmailSender, AuthMessageSender>();
+            services.AddTransient<ISmsSender, AuthMessageSender>();
             services.AddIdentity<User, Role>()
                 .AddEntityFrameworkStores<DBContext>()
                 .AddDefaultTokenProviders();
@@ -48,7 +51,8 @@ namespace DSSPG4_WEB
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole("admin","user"));
+                options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole("admin"));
+                options.AddPolicy("RequireCreatorRole", policy => policy.RequireRole("creator", "user"));
             });
             services.AddTransient<UserService>();
             services.AddTransient<RoleService>();

@@ -10,11 +10,13 @@ using DSSPG4_WEB.Services.UserServices;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using DSSPG4_WEB.Models.Enums;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DSSPG4_WEB.Controllers
 {
+    [Authorize(Policy = "RequireCreatorRole")]
     public class SurveyController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -140,6 +142,87 @@ namespace DSSPG4_WEB.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Take(int id)
+        {
+            TakeSurveyViewModel model = new TakeSurveyViewModel();
+            
+            var this_Survey = _surveyService.GetSurveyById(id);
+            var questionsList = _surveyService.GetSurveyQuestions(this_Survey.Id);
+
+            List<QResponses> qResponses  = new List<QResponses>();
+            foreach(var q in questionsList)
+            {
+                QResponses r = new QResponses();
+                r.QuestionId = q.Id;
+                r.QuestionValue = q.Question;
+                qResponses.Add(r);
+            }
+
+            model.QResponseList = qResponses;
+            return View(model.QResponseList);
+        }
+
+        [HttpPost]
+        public IActionResult Take(int id, IList<QResponses> model)
+        {
+            if (ModelState.IsValid)
+            {
+                string UserID = _userManager.GetUserId(User);
+                var this_User = _userService.GetById(UserID);
+                var this_survey = _surveyService.GetSurveyById(id);
+
+                if (model.Count > 0)
+                {
+                    foreach (var obj in model)
+                    {
+                        Response res = new Response();
+                        res.ParentQuestion = _surveyService.GetSurveyQuestionById(obj.QuestionId);
+                        res.SurveyTaker = this_User;
+                        res.QuestionResponse = obj.value;
+                        
+                        _surveyService.AddSurveyQuestionResponse(res);
+                    }
+                }
+                else
+                {
+                    return Content("Count: " + model.ToString());
+                }
+                _surveyService.BumpSurveyTakenCount(this_survey.Id);
+                return RedirectToAction("Index","Home");
+            }
+
+            return View(model);
+        }
+
+        public IActionResult SurveyResults(int id)
+        {
+            List<SurveyResultsViewModel> model = new List<SurveyResultsViewModel>();
+            var responseList = _surveyService.GetSurveyResponsesBySurveyId(id);
+            var allQuestions = _surveyService.GetSurveyQuestions(id);
+
+            foreach(var q in allQuestions)
+            {
+                var importantCount = responseList.Where(r => r.SurveyQuestionId == q.Id && r.QuestionResponse == ResponseValues.IMPORTANT).Count();
+                var notimportantCount = responseList.Where(r => r.SurveyQuestionId == q.Id && r.QuestionResponse == ResponseValues.NOTIMPORTANT).Count();
+                SurveyResultsViewModel obj = new SurveyResultsViewModel();
+
+                obj.ResponsesMarkedImportant = importantCount;
+                obj.ResponsesMarkedNotImportant = notimportantCount;
+                obj.Survey = _surveyService.GetSurveyById(id);
+                obj.SurveyQuestion = q;
+
+                model.Add(obj);
+            }
+
+
+            return View(model);
+        }
+        private Task<User> GetCurrentUserAsync()
+        {
+            return _userManager.GetUserAsync(HttpContext.User);
         }
     }
 }

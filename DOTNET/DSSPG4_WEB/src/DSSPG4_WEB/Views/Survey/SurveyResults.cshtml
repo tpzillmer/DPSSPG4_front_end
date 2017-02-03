@@ -1,0 +1,22 @@
+﻿@model IList<SurveyResultsViewModel>
+
+<h1 align="center">  @Model.FirstOrDefault().Survey.SurveyName </h1>
+<hr>
+<div>
+    @foreach (var res in Model)
+    {
+        <section class="panel panel-default">
+            <div class="panel-heading">@res.SurveyQuestion.Question</div>
+            <div class="panel-body">
+
+                <div>
+                  Important:   @res.ResponsesMarkedImportant 
+                </div>
+                <div>
+                  Not Important: @res.ResponsesMarkedNotImportant
+                </div>
+            </div>
+        </section>
+
+    }
+</div>

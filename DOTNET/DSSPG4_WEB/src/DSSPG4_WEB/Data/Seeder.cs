@@ -46,7 +46,8 @@ namespace DSSPG4_WEB.Data
             List<Role> roles = new List<Role>
             {
                 new Role { Name = "admin",Description = "Full site access" },
-                new Role { Name = "user", Description = "Regular user"}
+                new Role { Name = "user", Description = "Regular user"},
+                new Role { Name = "creator", Description = "Survey Creator"}
             };
 
             foreach (var r in roles)
@@ -62,11 +63,13 @@ namespace DSSPG4_WEB.Data
             foreach (var u in users)
             {
                 await _userService.AddUserToRole(u, "user");
+                await _userService.AddUserToRole(u, "admin");
+                await _userService.AddUserToRole(u, "creator");
             }
 
             List<Survey> surveys = new List<Survey>
             {
-                new Survey { SurveyName = "Test_Survey", NumberQuestions = 20, Creator = (_userService.GetByUserName("dsspg4_admin@gmail.com"))  }
+                new Survey { SurveyName = "Test_Survey", NumberQuestions = 20,Creator = (_userService.GetByUserName("dsspg4_admin@gmail.com"))  }
             };
 
             foreach (var s in surveys)

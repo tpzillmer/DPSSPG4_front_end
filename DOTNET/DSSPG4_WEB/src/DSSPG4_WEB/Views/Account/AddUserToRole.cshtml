@@ -1,0 +1,62 @@
+﻿@model RolesByUserViewModel
+
+<div id="modalUserToRole" tabindex="-1" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="post" asp-controller="Account" asp-action="AddUserToRole">
+                <div class="modal-header" style="padding:35px 50px;"><h1>@Model.User.UserName</h1></div>
+                <div asp-validation-summary="All"></div>
+                <div class="modal-body" style="padding:40px 50px;">
+
+                    <div class="form-group">
+                        @Html.HiddenFor(m => m.User.Id)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.HiddenFor(m => m.User.UserName)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.HiddenFor(m => m.User.FirstName)
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="RoleSelected"></label>
+                        @Html.DropDownListFor(m => m.RoleSelected, Model.Roles, new { @class = "form-control" })
+                        <span asp-validation-for="RoleSelected"></span>
+                    </div>
+
+                    <div>
+                        <input type="submit" class="btn btn-default btn-success btn-block" value="Add" />
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <a class="btn btn-default btn-danger pull-left" asp-controller="Account" asp-action="Index"><span class="glyphicon glyphicon-remove"></span> Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+@section  scripts{
+<script>
+    $(document).ready(function () {
+        $("#modalUserToRole").modal({
+            backdrop: 'static'
+        });
+        $("#modalUserToRole").modal('show');
+    });
+</script>
+<style>
+    .modal-header, h4, .close {
+        background-color: #000000;
+        color: white !important;
+        text-align: center;
+        font-size: 30px;
+    }
+
+    .modal-footer {
+        background-color: #000000;
+    }
+</style>
+}
