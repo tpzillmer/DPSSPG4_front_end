@@ -1,22 +1,51 @@
-﻿@model IList<SurveyResultsViewModel>
+﻿@model IList<SurveyResultsByUserViewModel>
 
-<h1 align="center">  @Model.FirstOrDefault().Survey.SurveyName </h1>
+<h1 align="center">@Model.FirstOrDefault().Survey.SurveyName </h1>
 <hr>
+<div class="table-responsive">
+    <table class="table table-striped">
+ 
+        <thead>
+            <tr>
+                <th>
+                    FirstName
+                </th>
+                <th>
+                    LastName
+                </th>
+                <th>
+                    Question
+                </th>
+                <th>
+                    Response
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+                @foreach (var item in Model)
+                {
+                        @foreach (var resp in item.Responses)
+                        {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.User.FirstName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.User.LastName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => resp.Question)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => resp.ResponseValue)
+                            </td>
+                            </tr>
+                            }
+                        }
+        <tbody>
+    </table>
+</div>
+
 <div>
-    @foreach (var res in Model)
-    {
-        <section class="panel panel-default">
-            <div class="panel-heading">@res.SurveyQuestion.Question</div>
-            <div class="panel-body">
-
-                <div>
-                  Important:   @res.ResponsesMarkedImportant 
-                </div>
-                <div>
-                  Not Important: @res.ResponsesMarkedNotImportant
-                </div>
-            </div>
-        </section>
-
-    }
+    <a asp-action="Index">Back to List</a>
 </div>

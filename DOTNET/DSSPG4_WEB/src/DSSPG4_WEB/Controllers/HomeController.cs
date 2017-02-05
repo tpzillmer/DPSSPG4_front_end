@@ -2,7 +2,6 @@
 using DSSPG4_WEB.Models.HomeViewModels;
 using DSSPG4_WEB.Services.SurveyServices;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace DSSPG4_WEB.Controllers

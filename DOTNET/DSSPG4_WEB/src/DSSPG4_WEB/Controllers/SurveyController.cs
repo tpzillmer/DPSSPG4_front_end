@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using DSSPG4_WEB.Services.UserServices;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using DSSPG4_WEB.Models.Enums;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -147,22 +145,32 @@ namespace DSSPG4_WEB.Controllers
         [HttpGet]
         public IActionResult Take(int id)
         {
-            TakeSurveyViewModel model = new TakeSurveyViewModel();
-            
-            var this_Survey = _surveyService.GetSurveyById(id);
-            var questionsList = _surveyService.GetSurveyQuestions(this_Survey.Id);
+            string UserID = _userManager.GetUserId(User);
 
-            List<QResponses> qResponses  = new List<QResponses>();
-            foreach(var q in questionsList)
+            if (_surveyService.UserTookSurvey(id, UserID))
             {
-                QResponses r = new QResponses();
-                r.QuestionId = q.Id;
-                r.QuestionValue = q.Question;
-                qResponses.Add(r);
+                return View("~/Views/Survey/_SurveyTaken.cshtml");
             }
+            else
+            {
 
-            model.QResponseList = qResponses;
-            return View(model.QResponseList);
+                TakeSurveyViewModel model = new TakeSurveyViewModel();
+
+                var this_Survey = _surveyService.GetSurveyById(id);
+                var questionsList = _surveyService.GetSurveyQuestions(this_Survey.Id);
+
+                List<QResponses> qResponses = new List<QResponses>();
+                foreach (var q in questionsList)
+                {
+                    QResponses r = new QResponses();
+                    r.QuestionId = q.Id;
+                    r.QuestionValue = q.Question;
+                    qResponses.Add(r);
+                }
+
+                model.QResponseList = qResponses;
+                return View(model.QResponseList);
+            }
         }
 
         [HttpPost]
@@ -199,6 +207,71 @@ namespace DSSPG4_WEB.Controllers
 
         public IActionResult SurveyResults(int id)
         {
+            List<SurveyResultsByUserViewModel> model = new List<SurveyResultsByUserViewModel>();
+            var allTakers = _surveyService.GetSurveyTakersIds(id);
+            var this_Survey = _surveyService.GetSurveyById(id);
+
+            foreach (var takerId in allTakers)
+            {
+                var this_User = _userService.GetById(takerId);
+                bool userAlreadyInList = model.Any(m => m.User.Id == this_User.Id);
+
+                if (userAlreadyInList == false)
+                {
+                    SurveyResultsByUserViewModel thisUserModel = new SurveyResultsByUserViewModel();
+                    var usrResponses = _surveyService.GetSurveyResponsesBySurveyIdAndUserID(id, takerId);
+                    thisUserModel.User = this_User;
+                    thisUserModel.Survey = this_Survey;
+                    List<SurveyViewModelResponseData> rspDataList = new List<SurveyViewModelResponseData>();
+                    foreach (var res in usrResponses)
+                    {
+                        SurveyViewModelResponseData rspData = new SurveyViewModelResponseData();
+                        SurveyQuestion question = _surveyService.GetSurveyQuestionById(res.SurveyQuestionId);
+                        rspData.Question = question.Question;
+                        rspData.ResponseValue = res.QuestionResponse;
+                        rspDataList.Add(rspData);
+                    }
+
+                    thisUserModel.Responses = rspDataList;
+                    model.Add(thisUserModel);
+                }
+
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        [Route("data.csv")]
+        [Produces("text/csv")]
+        public IActionResult Export(int id)
+        {
+            List<SurveyViewModelResponseDataCSV> model = new List<SurveyViewModelResponseDataCSV>();
+            var allTakers = _surveyService.GetSurveyTakersIds(id);
+            var this_Survey = _surveyService.GetSurveyById(id);
+            foreach (var takerId in allTakers)
+            {
+                var this_User = _userService.GetById(takerId);
+                SurveyViewModelResponseDataCSV thisUserModel = new SurveyViewModelResponseDataCSV();
+                var usrResponses = _surveyService.GetSurveyResponsesBySurveyIdAndUserID(id, takerId);
+                thisUserModel.FirstName = this_User.FirstName;
+                thisUserModel.LastName = this_User.LastName;
+
+                foreach (var res in usrResponses)
+                {
+                    SurveyQuestion question = _surveyService.GetSurveyQuestionById(res.SurveyQuestionId);
+                    thisUserModel.Question = question.Question;
+                    thisUserModel.ResponseValue = res.QuestionResponse;
+                }
+
+                model.Add(thisUserModel);
+            }
+
+            return Ok(model);
+        }
+
+        /*public IActionResult SurveyResults(int id)
+        {
             List<SurveyResultsViewModel> model = new List<SurveyResultsViewModel>();
             var responseList = _surveyService.GetSurveyResponsesBySurveyId(id);
             var allQuestions = _surveyService.GetSurveyQuestions(id);
@@ -219,7 +292,9 @@ namespace DSSPG4_WEB.Controllers
 
 
             return View(model);
-        }
+        } */
+
+
         private Task<User> GetCurrentUserAsync()
         {
             return _userManager.GetUserAsync(HttpContext.User);

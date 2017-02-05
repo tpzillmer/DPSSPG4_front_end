@@ -1,6 +1,8 @@
 ﻿using DSSPG4_WEB.Data;
 using DSSPG4_WEB.Models.Entities;
 using DSSPG4_WEB.Models.Enums;
+using DSSPG4_WEB.Services.UserServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,10 +11,12 @@ namespace DSSPG4_WEB.Services.SurveyServices
     public class SurveyService
     {
         private DBContext _context;
+        private UserService _userService;
 
-        public SurveyService(DBContext context)
+        public SurveyService(DBContext context, UserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         public void Add(Survey survey)
@@ -103,6 +107,24 @@ namespace DSSPG4_WEB.Services.SurveyServices
             return _context.Responses.Where(r => r.ParentQuestion.ParentSurvey.Id == id);
         }
 
+        public IEnumerable<Response> GetSurveyResponsesBySurveyIdAndUserID(int id,string userId)
+        {
+            return _context.Responses.Where(r => r.ParentQuestion.ParentSurvey.Id == id && r.SurveyTaker.Id == userId);
+        }
+
+        public IEnumerable<String> GetSurveyTakersIds (int surveryId)
+        {
+            IEnumerable<Response> response = GetSurveyResponsesBySurveyId(surveryId);
+            List<String> allUsers = new List<String>();
+
+            foreach (var res in response)
+            {
+                allUsers.Add(res.UserId);
+            }
+
+            return allUsers;
+        }
+
         public SurveyQuestion GetSurveyQuestionById(int id)
         {
             return _context.SurveyQuestions.FirstOrDefault(q => q.Id == id);
@@ -131,6 +153,17 @@ namespace DSSPG4_WEB.Services.SurveyServices
         public IEnumerable<Survey> GetAllClosedSurveys()
         {
             return _context.Surveys.Where(s => s.Status == SurveyStatus.Closed);
+        }
+
+        public bool UserTookSurvey(int surveyId, string userId)
+        {
+            var responsesByThisUser = GetSurveyResponsesBySurveyIdAndUserID(surveyId, userId);
+
+            if (responsesByThisUser.Any(s => s.UserId == userId))
+            {
+                return true;
+            }
+            else return false;
         }
     }
 }
