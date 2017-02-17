@@ -20,7 +20,7 @@ namespace DSSPG4_WEB.Models.SurvetViewModels
         [Required]
         public string QuestionValue { get; set; }
         [Required]
-        [System.ComponentModel.DefaultValue(ResponseValues.NOTIMPORTANT)]
+        [System.ComponentModel.DefaultValue(ResponseValues.NEUTRAL)]
         public ResponseValues value { get; set; }
 
     }
