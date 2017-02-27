@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using DSSPG4_WEB.Services.UserServices;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using DSSPG4_WEB.Models.Enums;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -169,12 +170,12 @@ namespace DSSPG4_WEB.Controllers
                 }
 
                 model.QResponseList = qResponses;
-                return View(model.QResponseList);
+                return View(model);
             }
         }
 
         [HttpPost]
-        public IActionResult Take(int id, IList<QResponses> model)
+        public IActionResult Take(int id, TakeSurveyViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -182,14 +183,16 @@ namespace DSSPG4_WEB.Controllers
                 var this_User = _userService.GetById(UserID);
                 var this_survey = _surveyService.GetSurveyById(id);
 
-                if (model.Count > 0)
+                if (model.QResponseList.Count > 0)
                 {
-                    foreach (var obj in model)
+
+                    foreach (var obj in model.QResponseList)
                     {
                         Response res = new Response();
+
                         res.ParentQuestion = _surveyService.GetSurveyQuestionById(obj.QuestionId);
                         res.SurveyTaker = this_User;
-                        res.QuestionResponse = obj.value;
+                        res.QuestionResponse = (ResponseValues)obj.value;
                         
                         _surveyService.AddSurveyQuestionResponse(res);
                     }
@@ -202,9 +205,10 @@ namespace DSSPG4_WEB.Controllers
                 return RedirectToAction("Index","Home");
             }
 
-            return View(model);
+            return Content(ModelState.Values.ToString());
         }
-
+        
+       
         public IActionResult SurveyResults(int id)
         {
             List<SurveyResultsByUserViewModel> model = new List<SurveyResultsByUserViewModel>();
