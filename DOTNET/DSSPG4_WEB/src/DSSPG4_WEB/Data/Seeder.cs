@@ -27,19 +27,19 @@ namespace DSSPG4_WEB.Data
             {
                 new User
                 {
-                    FirstName = "dsspg4_admin",
+                    FirstName = "admin",
                     LastName = "na",
-                    UserName = "dsspg4_admin@gmail.com",
+                    UserName = "admin@gmail.com",
                     PasswordHash = "!QAZ1qaz",
-                    Email = "dsspg4_admin@gmail.com"
+                    Email = "admin@gmail.com"
                 },
                 new User
                 {
-                    FirstName = "dsspg4_admin_2",
+                    FirstName = "admin_2",
                     LastName = "na",
-                    UserName = "dsspg4_admin_2@gmail.com",
+                    UserName = "admin_2@gmail.com",
                     PasswordHash = "!QAZ1qaz",
-                    Email = "dsspg4_admin_2@gmail.com"
+                    Email = "admin_2@gmail.com"
                 }
             };
 
@@ -69,7 +69,7 @@ namespace DSSPG4_WEB.Data
 
             List<Survey> surveys = new List<Survey>
             {
-                new Survey { SurveyName = "Test_Survey", NumberQuestions = 20,Creator = (_userService.GetByUserName("dsspg4_admin@gmail.com"))  }
+                new Survey { SurveyName = "Test_Survey", NumberQuestions = 20,Creator = (_userService.GetByUserName("admin@gmail.com"))  }
             };
 
             foreach (var s in surveys)
@@ -82,11 +82,10 @@ namespace DSSPG4_WEB.Data
 
             List<SurveyQuestion> surveyQuestions = new List<SurveyQuestion>
             {
-                new SurveyQuestion { Question = "Do you like dogs?", ParentSurvey = (_surveyService.GetSurveyByName("Test_Survey")) },
-                new SurveyQuestion { Question = "Do you like cats?", ParentSurvey = (_surveyService.GetSurveyByName("Test_Survey")) },
-                new SurveyQuestion { Question = "Do you like dogs?", ParentSurvey = (_surveyService.GetSurveyByName("Test_Survey")) }
+                new SurveyQuestion { Question = "I Love Dogs", ParentSurvey = (_surveyService.GetSurveyByName("Test_Survey")) },
+                new SurveyQuestion { Question = "I Love Cats", ParentSurvey = (_surveyService.GetSurveyByName("Test_Survey")) },
+                new SurveyQuestion { Question = "I Love Panda Bears", ParentSurvey = (_surveyService.GetSurveyByName("Test_Survey")) }
             };
-
 
             _surveyService.AddSurveyQuestions(surveyQuestions);
         }

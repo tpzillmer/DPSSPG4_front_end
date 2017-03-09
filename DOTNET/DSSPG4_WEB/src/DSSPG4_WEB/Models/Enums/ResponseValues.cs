@@ -7,7 +7,10 @@ namespace DSSPG4_WEB.Models.Enums
 {
     public enum ResponseValues
     {
-        IMPORTANT = 1,
-        NOTIMPORTANT =2,
+        MOST_AGREE = 2,
+        AGREE =1,
+        NEUTRAL = 0,
+        DISAGREE= -1,
+        MOST_DISAGREE=-2
     }
 }

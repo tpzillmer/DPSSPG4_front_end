@@ -11,6 +11,8 @@ using DSSPG4_WEB.Services.RoleServices;
 using DSSPG4_WEB.Services.SurveyServices;
 using DSSPG4_WEB.Interfaces;
 using DSSPG4_WEB.Services.MessageSevices;
+using DSSPG4_WEB.Services.Misc;
+using Microsoft.Net.Http.Headers;
 
 namespace DSSPG4_WEB
 {
@@ -40,14 +42,21 @@ namespace DSSPG4_WEB
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
             services.AddDbContext<DBContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("Azure")));
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
             services.AddIdentity<User, Role>()
                 .AddEntityFrameworkStores<DBContext>()
                 .AddDefaultTokenProviders();
+            var csvFormatterOptions = new CsvFormatterOptions();
 
-            services.AddMvc();
+            services.AddMvc( options =>
+            {
+                options.InputFormatters.Add(new CsvInputFormatter(csvFormatterOptions));
+                options.OutputFormatters.Add(new CsvOutputFormatter(csvFormatterOptions));
+                options.FormatterMappings.SetMediaTypeMappingForFormat("csv", MediaTypeHeaderValue.Parse("text/csv"));
+            }
+            );
 
             services.AddAuthorization(options =>
             {

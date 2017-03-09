@@ -1,0 +1,32 @@
+﻿@model IList<QResponses>
+
+<form method="post" asp-controller="Survey" asp-action="Take" class="form-horizontal">
+    <h2>Questions</h2>
+    <hr />
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    @for (var i = 0; i < Model.Count; i++)
+    {
+        @Html.HiddenFor(x => x[i].QuestionId)
+        @Html.HiddenFor(x => x[i].QuestionValue)
+        <div class="form-group">
+            <label class="col-md-2 control-label">@Model[i].QuestionValue</label>
+            <div class="col-md-10">
+                <select asp-for="@Model[i].value" asp-items="@Html.GetEnumSelectList<ResponseValues>()" class="form-control"></select>
+                <span asp-validation-for="@Model[i].value" class="text-danger"></span>
+            </div>
+        </div>
+    }
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-default btn-success">Submit</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+}

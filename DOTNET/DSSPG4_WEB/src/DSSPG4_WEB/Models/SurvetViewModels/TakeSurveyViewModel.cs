@@ -11,6 +11,11 @@ namespace DSSPG4_WEB.Models.SurvetViewModels
     public class TakeSurveyViewModel
     {
         public List<QResponses> QResponseList { get; set; }
+        public IList<int> MostAgree { get; set; }
+        public IList<int> Agree { get; set; }
+        public IList<int> Neutral { get; set; }
+        public IList<int> MostDisagree { get; set; }
+        public IList<int> Disagree { get; set; }
     }
 
     public class QResponses
@@ -20,8 +25,8 @@ namespace DSSPG4_WEB.Models.SurvetViewModels
         [Required]
         public string QuestionValue { get; set; }
         [Required]
-        [System.ComponentModel.DefaultValue(ResponseValues.NOTIMPORTANT)]
-        public ResponseValues value { get; set; }
+        [System.ComponentModel.DefaultValue(ResponseValues.NEUTRAL)]
+        public int value { get; set; }
 
     }
 }
